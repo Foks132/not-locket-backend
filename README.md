@@ -35,11 +35,11 @@ $ npm install
 ## .ENV
 ```
 JWT_SECRET = 'example_secret'
-DB_HOST='localhost'
-DB_PORT='3306'
-DB_USERNAME='root'
-DB_PASSWORD='root'
-DB_NAME='database'
+DB_HOST = 'localhost'
+DB_PORT = '3306'
+DB_USERNAME = 'root'
+DB_PASSWORD = 'root'
+DB_NAME = 'database'
 ```
 
 ## Running the app
