@@ -1,49 +1,33 @@
-/* eslint-disable prettier/prettier */
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import * as argon2 from 'argon2';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload, Token } from './types';
 import { ReadUserDto } from 'src/users/dto/read-user.dto';
+import { LoginAuthDto } from './dto/login-auth.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UsersService) {}
+  constructor(
+    private userService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
-  async create(dto: CreateAuthDto): Promise<ReadUserDto | null> {
-    if (await this.userService.emailExists(dto.email)) {
-      throw new HttpException('This email address is already in use', HttpStatus.CONFLICT);
-    }
-    if (await this.userService.usernameExists(dto.username)) {
-      throw new HttpException('This user name is already in use', HttpStatus.CONFLICT);
-    }
-    const user = await this.userService.create(
-      {
-        firstname: dto.firstname,
-        lastname: dto.lastname,
-        username: dto.username,
-        email: dto.email,
-        password: dto.password,
-        gender: dto.gender
-      })
-      if (!user) {
-        throw new HttpException('User data is incorrect', HttpStatus.BAD_REQUEST);
-      }
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<ReadUserDto | null> {
+    const user = await this.userService.findByEmail(email);
+    console.log(user);
+    const passwordIsMatch = await argon2.verify(user.password, password);
+    if (user && passwordIsMatch) {
       return user;
+    }
+    throw new UnauthorizedException('User or password is incorrect');
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async login(user: LoginAuthDto): Promise<Token | null> {
+    const payload: JwtPayload = { id: user.id, email: user.email };
+    return { accessToken: this.jwtService.sign(payload) };
   }
 }

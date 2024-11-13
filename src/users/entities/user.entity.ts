@@ -39,7 +39,7 @@ export class User {
   @Column({ type: 'nvarchar', select: false })
   email: string
 
-  @Column({ type: 'nvarchar', select: false })
+  @Column({ type: 'nvarchar', select: true })
   password: string
 
   @OneToOne(() => Token, t => t.user)

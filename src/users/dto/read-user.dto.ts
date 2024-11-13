@@ -25,4 +25,6 @@ export class ReadUserDto {
 
   @IsString()
   gender: UserGender;
+
+  password: string;
 }

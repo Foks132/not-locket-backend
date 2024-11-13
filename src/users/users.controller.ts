@@ -3,11 +3,17 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FindUserDto } from './dto/find-user.dto';
 import { isEmpty } from 'class-validator';
-import { CreateAuthDto } from 'src/auth/dto/create-auth.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Post('register')
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
+  }
 
   @Get()
   findAll() {
@@ -27,10 +33,5 @@ export class UsersController {
     if (isEmpty(dto.username)) {
       return await this.usersService.findByEmail(dto.email);
     }
-  }
-
-  @Post()
-  create(@Body() dto: CreateAuthDto) {
-    return this.usersService.create(dto);
   }
 }
