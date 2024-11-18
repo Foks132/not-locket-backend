@@ -34,12 +34,14 @@ $ npm install
 
 ## .ENV
 ```
-JWT_SECRET = 'example_secret'
-DB_HOST = 'localhost'
-DB_PORT = '3306'
-DB_USERNAME = 'root'
-DB_PASSWORD = 'root'
-DB_NAME = 'database'
+JWT_SECRET='ApplicationJWTToken'
+APP_PORT=3000
+DATABASE_HOST='localhost'
+DATABASE_PORT=3311
+DATABASE_USERNAME='root'
+DATABASE_PASSWORD='root'
+DATABASE_NAME='base'
+
 ```
 
 ## Running the app
