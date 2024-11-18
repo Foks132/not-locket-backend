@@ -32,7 +32,7 @@ export class UsersService {
             password: await argon2.hash(createUserDto.password)
         })
         const { password, ...userWithoutPassword } = user;
-        return {...userWithoutPassword, token};
+        return { ...userWithoutPassword, token };
     }
 
     async findAll(): Promise<ReadUserDto[]> {

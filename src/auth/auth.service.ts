@@ -18,7 +18,6 @@ export class AuthService {
     password: string,
   ): Promise<ReadUserDto | null> {
     const user = await this.userService.findByEmail(email);
-    console.log(user);
     const passwordIsMatch = await argon2.verify(user.password, password);
     if (user && passwordIsMatch) {
       return user;
