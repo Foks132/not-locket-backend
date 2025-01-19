@@ -1,19 +1,44 @@
-version: '3.7'
+version: '3.8'
+
+networks:
+  db-net:
+    driver: bridge
 
 services:
+ mysql:
+    image: mysql:8.3.0
+    container_name: no-locket-backend-mysql
+    command: --default-authentication-plugin=caching_sha2_password
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: $DATABASE_PASSWORD
+      MYSQL_DATABASE: $DATABASE_NAME
+    ports:
+      - $DATABASE_PORT:$DATABASE_PORT
+    expose:
+      - $DATABASE_PORT
+    volumes:
+      - ./docker/dbdata:/var/lib/mysql/
+    networks:
+      - db-net
+
  minio:
    image: minio/minio:latest
-   command: server --console-address ":9001" /data/
+   command: server --console-address :$S3_QUERYPORT /data/
    ports:
-     - "9000:9000"
-     - "9001:9001"
+     - $S3_PORT:$S3_PORT
+     - $S3_QUERYPORT:$S3_QUERYPORT
+   env_file:
+      - .env
    environment:
-     MINIO_ROOT_USER: root
-     MINIO_ROOT_PASSWORD: root7575
+     MINIO_ROOT_USER: $S3_USERNAME
+     MINIO_ROOT_PASSWORD: $S3_PASSWORD
    volumes:
      - minio-storage:/data
    healthcheck:
-     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+     test: ["CMD", "curl", "-f", "http://localhost:$S3_PORT/minio/health/live"]
      interval: 30s
      timeout: 20s
      retries: 3

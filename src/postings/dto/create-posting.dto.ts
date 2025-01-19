@@ -1,21 +1,24 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreatePostingDto {
   @IsNumber()
   id?: number;
 
-  @IsString()
-  bucket: string;
+  @IsOptional()
+  @IsNumber()
+  bucketId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  userId: number;
 
   @IsString()
   name: string;
 
   @IsString()
-  description: string;
+  description?: string;
 
+  @IsOptional()
   @IsNumber()
   size: number;
-
-  @IsString()
-  sourceFile: string;
 }

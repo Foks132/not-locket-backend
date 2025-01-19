@@ -3,6 +3,6 @@ export type Token = {
 };
 
 export type JwtPayload = {
-  id: number;
+  sub: number;
   email: string;
 };

@@ -7,5 +7,5 @@ export class LoginUserDto extends PartialType(
   OmitType(ReadUserDto, ['password'] as const),
 ) {
   @IsString()
-  token: string;
+  accessToken: string;
 }

@@ -1,12 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { Type } from 'class-transformer';
-import { Token } from 'src/tokens/entities/token.entity';
+import { IsOptional } from 'class-validator';
+import { Posting } from 'src/postings/entities/posting.entity';
 import {
   Column,
   Entity,
-  JoinColumn,
-  OneToOne,
-  RelationId,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -42,11 +40,14 @@ export class User {
   @Column({ type: 'nvarchar', select: true })
   password: string
 
-  @OneToOne(() => Token, t => t.user)
-  @JoinColumn()
-  @Type(() => Token)
-  token?: Token;
-  @RelationId((u: User) => u.token)
-  @Column({ nullable: true })
-  tokenId?: number;
+  @Column({ type: 'nvarchar', select: false, nullable: true })
+  @IsOptional()
+  accessToken?: string
+
+  @Column({ type: 'nvarchar', select: false, nullable: true })
+  @IsOptional()
+  refreshToken?: string
+
+  @OneToMany(() => Posting, (posting) => posting.user, { cascade: true })
+  postings: Posting[];
 }

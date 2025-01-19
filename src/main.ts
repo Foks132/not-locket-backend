@@ -12,6 +12,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   const configService = new ConfigService();
   await app.listen(configService.get('APP_PORT'));
-  log(`Server started: ${configService.get('DATABASE_HOST')}:${configService.get('DATABASE_PORT')}`)
+  log(`Server started: ${configService.get('APP_HOST')}:${configService.get('APP_PORT')}`)
 }
 bootstrap();

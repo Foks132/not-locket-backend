@@ -8,6 +8,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login-user.dto';
+import { promises } from 'dns';
+import { JwtPayload, Token } from 'src/auth/types';
 
 @Injectable()
 export class UsersService {
@@ -29,10 +31,29 @@ export class UsersService {
             lastname: createUserDto.lastname,
             username: createUserDto.username,
             email: createUserDto.email,
-            password: await argon2.hash(createUserDto.password)
+            password: await argon2.hash(createUserDto.password),
+            accessToken: token
         })
         const { password, ...userWithoutPassword } = user;
-        return { ...userWithoutPassword, token };
+        return { ...userWithoutPassword };
+    }
+
+    async updateToken(accessToken: string): Promise<Token | null> {
+        const payload: JwtPayload = this.jwtService.verify(accessToken);
+        const user = await this.userRepository.findOneBy({ id: payload.sub });
+        if (!user) {
+            throw new BadRequestException('User not found');
+        }
+
+        const newPayload: JwtPayload = {
+            sub: user.id,
+            email: user.email
+        }
+        const newAccessToken: string = this.jwtService.sign(newPayload);
+        user.accessToken = newAccessToken;
+        this.userRepository.save(user);
+        console.log(newAccessToken)
+        return { accessToken: newAccessToken };
     }
 
     async findAll(): Promise<ReadUserDto[]> {
@@ -42,15 +63,16 @@ export class UsersService {
     async findOne(id: number): Promise<ReadUserDto | null> {
         const user = await this.userRepository.findOneBy({ id });
         if (!user) {
-            throw new HttpException('User not found 1', HttpStatus.NOT_FOUND);
+            throw new HttpException('User not found by id', HttpStatus.NOT_FOUND);
         }
+        console.log(user)
         return user;
     }
 
     async findByUsername(username: string): Promise<ReadUserDto | null> {
         const user = await this.userRepository.findOneBy({ username });
         if (!user) {
-            throw new HttpException('User not found 2', HttpStatus.NOT_FOUND);
+            throw new HttpException('User not found by username', HttpStatus.NOT_FOUND);
         }
         return user;
     }
@@ -58,7 +80,7 @@ export class UsersService {
     async findByEmail(email: string): Promise<ReadUserDto | null> {
         const user = await this.userRepository.findOneBy({ email });
         if (!user) {
-            throw new HttpException('User not found 3', HttpStatus.NOT_FOUND)
+            throw new HttpException('User not found by email', HttpStatus.NOT_FOUND)
         }
         return user
     }
