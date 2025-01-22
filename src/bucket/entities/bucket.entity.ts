@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Posting } from "src/postings/entities/posting.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 

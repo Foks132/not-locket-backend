@@ -8,7 +8,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login-user.dto';
-import { promises } from 'dns';
 import { JwtPayload, Token } from 'src/auth/types';
 
 @Injectable()

@@ -18,7 +18,6 @@ export class S3Service {
     });
   }
 
-  // Создание s3 хранилища
   async createBucketIfNotExists(name: string): Promise<void> {
     const bucketExists = await this.s3Client.bucketExists(name);
     if (!bucketExists) {
@@ -27,7 +26,6 @@ export class S3Service {
     }
   }
 
-  // Загрузка файлов
   async uploadFile(
     bucket: string,
     objectName: string,

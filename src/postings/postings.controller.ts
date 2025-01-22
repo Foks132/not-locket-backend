@@ -23,11 +23,20 @@ export class PostingsController {
     @Request() req,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: "image/jpeg" })],
+        validators: [
+          new FileTypeValidator({
+            fileType: /^image\/(jpeg|png|gif|webp|bmp|tiff)$/,
+          }),
+        ],
       }),
     )
     file: Express.Multer.File,
   ) {
+    console.log("Uploaded file:", {
+      userId: req.user.sub,
+      originalName: file.originalname,
+      mimeType: file.mimetype,
+    });
     return this.postingsService.create(file, req.user.sub);
   }
 }

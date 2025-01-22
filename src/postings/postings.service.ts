@@ -6,6 +6,7 @@ import { Posting } from "./entities/posting.entity";
 import { ReadPostingDto } from "./dto/read-posting.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { BucketService } from "src/bucket/bucket.service";
+import { extname } from "path";
 
 @Injectable()
 export class PostingsService implements OnModuleInit {
@@ -24,41 +25,61 @@ export class PostingsService implements OnModuleInit {
     file: Express.Multer.File,
     userId: number,
   ): Promise<ReadPostingDto | null> {
+    const queryRunner =
+      this.postingsRepository.manager.connection.createQueryRunner();
+
+    await queryRunner.startTransaction();
+
     try {
+      const date = new Date();
+      const formattedDate = date.toISOString().replace(/:/g, "-");
+      const fileNameExtension = extname(file.originalname);
+      const fileName = `userId:${userId} date:${formattedDate}${fileNameExtension}`;
+
       const post: CreatePostingDto = {
         bucketId: 1,
         userId: userId,
-        name: file.originalname,
+        name: fileName,
         description: null,
         size: file.size,
       };
-      const posting = await this.postingsRepository.save(post);
+
+      const savedPost = await queryRunner.manager.save(
+        this.postingsRepository.target,
+        post,
+      );
+
       const bucket = await this.bucketService.findOne(post.bucketId);
 
       const metaData = {
         "Content-Type": "multipart/form-data",
-        "X-Amz-Meta-Name": file.fieldname,
-        Id: post.id,
-        UserId: userId,
+        "X-Amz-Meta-Name": post.name,
+        "X-Amz-Meta-Id": post.id,
+        "X-Amz-Meta-Userid": post.userId,
+        "Cache-Control": "public, max-age=31536000",
       };
 
       await this.s3Service.uploadSFile(
         bucket.name,
-        posting.name,
+        savedPost.name,
         file.buffer,
         file.size,
         metaData,
       );
 
+      await queryRunner.commitTransaction();
+
       return {
-        id: posting.id,
-        name: posting.name,
-        description: posting.description,
+        id: post.id,
+        name: post.name,
+        description: post.description,
         userId: userId,
       };
     } catch (error) {
       console.error("Error creating posting:", error);
       throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 }
