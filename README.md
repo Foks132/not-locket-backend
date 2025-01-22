@@ -34,13 +34,21 @@ $ npm install
 
 ## .ENV
 ```
-JWT_SECRET='ApplicationJWTToken'
 APP_PORT=3000
+APP_HOST='localhost'
 DATABASE_HOST='localhost'
-DATABASE_PORT=3311
+DATABASE_PORT=3306
 DATABASE_USERNAME='root'
-DATABASE_PASSWORD='root'
+DATABASE_PASSWORD='password'
 DATABASE_NAME='base'
+JWT_SECRET='ApplicationJWTToken'
+S3_HOST='localhost'
+S3_PORT=9000
+S3_QUERYPORT=9001
+S3_USERNAME='root'
+S3_PASSWORD='password'
+S3_ACCESSKEY='S3ApplicationAccessKey'
+S3_SECRETKEY='S3ApplicationSecretKey'
 
 ```
 
